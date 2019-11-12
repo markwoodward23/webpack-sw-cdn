@@ -16,6 +16,6 @@ Exploring Webpack with Workbox service workers to cache .js bundles + CDN links.
 - React loads in 22ms, from the service worker cache, rather than the horrendously slow 175ms from unpkg.
 - 💯 perf score. 
 
-## Next
+## Next
 1. Cached app shell
 2. Asset handling
