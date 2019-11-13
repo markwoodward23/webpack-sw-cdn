@@ -1,24 +1,33 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
+const Koa = require('koa');
+const Router = require('koa-router');
+const SSR = require('./ssr');
 
-const Index = () => {
-  const [val, setVal] = useState(0);
-  return (
-    <div>
-      <button onClick={() => setVal(val+1)}>Send it</button>
-      <p>{val}</p>
-    </div>
-  );
-};
+const app = new Koa();
+const router = new Router();
+//preload all components on server side
+SSR.preloadAll();
 
-ReactDOM.render(<Index />, document.getElementById("index"));
+const s = new SSR();
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/build.sw.js').then(registration => {
-      console.log('SW registered: ', registration);
-    }).catch(registrationError => {
-      console.log('SW registration failed: ', registrationError);
-    });
-  });
-}
+router.get('*', async (ctx) => {
+  const rendered = s.render(ctx.url);
+  
+  const html = `
+    <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body>
+        <div id="app">${rendered.html}</div>
+        <script type="text/javascript" src="/runtime.js"></script>
+        ${rendered.scripts.join()}
+        <script type="text/javascript" src="/app.js"></script>
+      </body>
+    </html>
+  `
+});
+
+app.use(router.routes());
+app.listen(3000, '0.0.0.0');
+

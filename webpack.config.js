@@ -1,5 +1,6 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const workboxPlugin = require('workbox-webpack-plugin');
+const ReactLoadablePlugin = require('react-loadable/webpack').ReactLoadablePlugin
 
 const htmlWebpackPlugin = new HtmlWebPackPlugin({
   template: "./src/index.html",
@@ -19,7 +20,7 @@ const workbox = new workboxPlugin.GenerateSW({
     },
     {
       urlPattern: /\.(js|css|png|jpg|gif)/,
-      handler: 'staleWhileRevalidate',
+      handler: 'StaleWhileRevalidate',
     },
     {
       urlPattern: new RegExp('^https://unpkg\.com/*'),
@@ -53,9 +54,10 @@ module.exports = {
       }
     ]
   },
+  entry: './src/app.js',
   plugins: [
     htmlWebpackPlugin,
-    workbox
+    workbox,
+    new ReactLoadablePlugin({ filename: './build/react-loadable.json', }),
   ]
 };
-
